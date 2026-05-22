@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
   ArrowLeft, Monitor, Cpu, Plus, PackageOpen,
-  AlertCircle, CheckCircle2, Lock, KeyRound,
+  AlertCircle, CheckCircle2, Lock,
   Server, Keyboard, MousePointer2, AlertTriangle, QrCode, RotateCcw,
   AppWindow, X, Search,
 } from 'lucide-react'
@@ -282,11 +282,11 @@ export default function PCDetailPage() {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
           <div className="flex items-center gap-2 mb-3">
             <Lock className="w-4 h-4 text-slate-500" />
-            <h3 className="font-semibold text-slate-800 text-sm">Acces au PC</h3>
+            <h3 className="font-semibold text-slate-800 text-sm">Dernier mot de passe connu</h3>
           </div>
           {lastPassword ? (
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-              <p className="text-xs text-amber-600 font-medium mb-1">Dernier mot de passe signale</p>
+              <p className="text-xs text-amber-600 font-medium mb-1">Mot de passe signale</p>
               <p className="text-lg font-mono font-bold text-amber-900 tracking-widest">
                 {lastPassword.description}
               </p>
@@ -297,13 +297,9 @@ export default function PCDetailPage() {
           ) : (
             <p className="text-sm text-slate-400">Aucun mot de passe signale pour ce PC.</p>
           )}
-          <button
-            onClick={() => { setModalType('demande_mot_de_passe'); setModalOpen(true) }}
-            className="mt-3 flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
-          >
-            <KeyRound className="w-3.5 h-3.5" />
-            Je ne connais pas le mot de passe de ce PC
-          </button>
+          <p className="text-xs text-slate-400 mt-3">
+            Pour signaler un probleme d&apos;acces, utilisez le bouton <strong className="text-slate-600">Signaler</strong> en haut de la page.
+          </p>
         </div>
 
         {/* ── Popup logiciels ── */}
