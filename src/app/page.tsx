@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Monitor, Plus, RefreshCw, AlertTriangle, Wrench, Code2, Lock, Lightbulb, FolderOpen, BookMarked, Download, X, Eye, EyeOff } from 'lucide-react'
+import { Monitor, Plus, RefreshCw, AlertTriangle, Wrench, Code2, Lock, Lightbulb, FolderOpen, BookMarked, Download, X, Eye, EyeOff, Bell, Mail } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
 import PCCard from '@/components/PCCard'
 import AlertFeed from '@/components/AlertFeed'
 import ReportModal from '@/components/ReportModal'
+import AbonnementSection from '@/components/AbonnementSection'
 import type { PC, Alerte, Utilisation } from '@/types'
 
 export default function DashboardPage() {
@@ -154,6 +155,9 @@ export default function DashboardPage() {
           <StatCard label="Hors service"    value={stats.horsService} color="red"    />
           <StatCard label="Alertes ouvertes" value={stats.alertes}    color="blue"   />
         </div>
+
+        {/* ── Notifications email ── */}
+        <AbonnementSection />
 
         {/* ── Conseils & Bonnes pratiques ── */}
         <ConseilsSection />
@@ -423,7 +427,7 @@ function StatCard({ label, value, color }: { label: string; value: number; color
 
 function ConseilsSection() {
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
       {/* Conseil 1 — PC fixe */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
@@ -497,6 +501,35 @@ function ConseilsSection() {
         </p>
       </div>
 
+      {/* Conseil 3 — Notifications responsables */}
+      <div className="bg-white rounded-xl border border-indigo-200 shadow-sm p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="p-1.5 bg-indigo-100 rounded-lg">
+            <Mail className="w-4 h-4 text-indigo-600" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Bell className="w-3.5 h-3.5 text-indigo-400" />
+            <h3 className="text-sm font-bold text-slate-800">Responsables — inscrivez-vous !</h3>
+          </div>
+        </div>
+        <p className="text-sm text-slate-600 leading-relaxed">
+          Il est fortement recommande aux <strong className="text-slate-800">responsables de promo</strong> des
+          etudiants de 3eme, 4eme et 5eme annee de renseigner leur email dans le formulaire ci-dessus.
+        </p>
+        <p className="text-sm text-slate-600 leading-relaxed mt-2">
+          En cas d&apos;alerte materielle ou logicielle, vous serez <strong className="text-slate-800">immediatement
+          prevenu par email</strong> afin d&apos;apporter une solution dans les meilleurs delais a vos camarades
+          pour le bien des eleves ingenieurs.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {['3eme annee', '4eme annee', '5eme annee'].map((a) => (
+            <span key={a} className="text-xs bg-indigo-50 text-indigo-700 font-medium px-2.5 py-1 rounded-full border border-indigo-200">
+              {a}
+            </span>
+          ))}
+        </div>
+      </div>
+
     </section>
   )
 }
@@ -506,7 +539,7 @@ function generateReport(pcs: PC[], alertes: Alerte[], utilisations: Utilisation[
   const fmtDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
   const ETAT: Record<string, string> = { ok: 'Fonctionnel', probleme: 'Probleme', hors_service: 'Hors service' }
   const TYPE: Record<string, string> = {
-    mot_de_passe: 'Mot de passe signale', demande_mot_de_passe: 'Demande mot de passe',
+    mot_de_passe: 'Mot de passe signale', mot_de_passe_supprime: 'Mot de passe supprime', demande_mot_de_passe: 'Demande mot de passe',
     panne: 'Panne / ne demarre pas', materiel_uc: 'UC — probleme', materiel_moniteur: 'Moniteur — probleme',
     materiel_clavier: 'Clavier — probleme', materiel_souris: 'Souris — probleme',
     logiciel_manquant: 'Logiciel manquant', logiciel_installe: 'Logiciel installe',

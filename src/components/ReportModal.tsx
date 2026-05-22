@@ -12,8 +12,9 @@ import type { TypeAlerte, AnneeEtudiant } from '@/types'
 type ExtraType = 'password' | 'software' | 'software_remove' | 'software_missing' | undefined
 
 const TYPE_OPTIONS: { value: TypeAlerte; label: string; extra?: ExtraType }[] = [
-  { value: 'mot_de_passe',         label: "J'ai mis un mot de passe sur ce PC",    extra: 'password' },
-  { value: 'demande_mot_de_passe', label: "Je ne connais pas le mot de passe de ce PC" },
+  { value: 'mot_de_passe',          label: "J'ai mis un mot de passe sur ce PC",    extra: 'password' },
+  { value: 'mot_de_passe_supprime', label: "J'ai supprime le mot de passe de ce PC" },
+  { value: 'demande_mot_de_passe',  label: "Je ne connais pas le mot de passe de ce PC" },
   { value: 'panne',                label: 'PC en panne / ne demarre pas' },
   { value: 'materiel_uc',          label: 'Unite centrale manquante ou abimee' },
   { value: 'materiel_moniteur',    label: 'Moniteur manquant ou abime' },
@@ -49,7 +50,13 @@ export default function ReportModal({ isOpen, onClose, defaultPcNumero, onSucces
   const [form, setForm]       = useState({ ...EMPTY, pcNumero: defaultPcNumero ?? ('' as number | '') })
   const [loading, setLoading] = useState(false)
   const [pcLogiciels, setPcLogiciels] = useState<string[]>([])
+  const [pcList, setPcList]   = useState<{ numero: number; salle: string }[]>([])
   const firstInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    supabase.from('pcs').select('numero, salle').order('numero')
+      .then(({ data }) => { if (data) setPcList(data) })
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
@@ -92,20 +99,22 @@ export default function ReportModal({ isOpen, onClose, defaultPcNumero, onSucces
       toast.error('Veuillez selectionner ou saisir un logiciel.')
       return
     }
-    if (!isSoftwareType && selectedOption?.extra !== 'password' && !description.trim()) {
+    const descRequired = !isSoftwareType && selectedOption?.extra !== 'password' && typeAlerte !== 'mot_de_passe_supprime'
+    if (descRequired && !description.trim()) {
       toast.error('Veuillez remplir la description.')
       return
     }
 
-    // Pour logiciel_manquant, le nom du logiciel devient la description principale
     const finalDescription =
       selectedOption?.extra === 'password'
         ? motDePasse.trim()
         : selectedOption?.extra === 'software_missing'
         ? nomLogiciel.trim() + (description.trim() ? ` — ${description.trim()}` : '')
+        : typeAlerte === 'mot_de_passe_supprime'
+        ? description.trim() || 'Suppression du mot de passe'
         : description.trim()
 
-    const INFO_TYPES: TypeAlerte[] = ['logiciel_installe', 'logiciel_desinstalle', 'reinitialisation', 'mot_de_passe']
+    const INFO_TYPES: TypeAlerte[] = ['logiciel_installe', 'logiciel_desinstalle', 'reinitialisation', 'mot_de_passe', 'mot_de_passe_supprime']
     const isInfo = INFO_TYPES.includes(typeAlerte as TypeAlerte)
 
     setLoading(true)
@@ -141,11 +150,36 @@ export default function ReportModal({ isOpen, onClose, defaultPcNumero, onSucces
         }
       }
 
+      if (!isInfo) {
+        const TYPE_LABELS: Record<string, string> = {
+          panne:               'Panne / ne demarre pas',
+          materiel_uc:         'Unite centrale HS',
+          materiel_moniteur:   'Moniteur HS',
+          materiel_clavier:    'Clavier HS',
+          materiel_souris:     'Souris HS',
+          logiciel_manquant:   'Logiciel manquant',
+          demande_mot_de_passe:'Demande de mot de passe',
+          autre:               'Autre probleme',
+        }
+        fetch('/api/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pc_numero:    pcNumero,
+            type_label:   TYPE_LABELS[typeAlerte] ?? typeAlerte,
+            description:  finalDescription || 'Aucune description',
+            nom_etudiant: nom.trim(),
+            annee,
+          }),
+        }).catch(() => {})
+      }
+
       toast.success('Signalement envoye avec succes !')
       onSuccess?.()
       onClose()
-    } catch {
-      toast.error('Une erreur est survenue. Veuillez reessayer.')
+    } catch (err: unknown) {
+      const msg = (err as { message?: string })?.message ?? 'Une erreur est survenue. Veuillez reessayer.'
+      toast.error(msg)
     } finally {
       setLoading(false)
     }
@@ -212,11 +246,9 @@ export default function ReportModal({ isOpen, onClose, defaultPcNumero, onSucces
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent bg-white transition"
             >
               <option value="">-- Selectionnez un PC --</option>
-              {Array.from({ length: 44 }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>PC {n} — Salle IA</option>
+              {pcList.map((pc) => (
+                <option key={pc.numero} value={pc.numero}>PC {pc.numero} — {pc.salle}</option>
               ))}
-              <option value={45}>PC 45 — Salle Connexe</option>
-              <option value={46}>PC 46 — Salle Connexe</option>
             </select>
           </div>
 
@@ -280,8 +312,9 @@ export default function ReportModal({ isOpen, onClose, defaultPcNumero, onSucces
               </div>
               <div className="grid grid-cols-2 gap-1.5">
                 {([
-                  { v: 'mot_de_passe',        l: "J'ai mis un mot de passe" },
-                  { v: 'demande_mot_de_passe', l: "Je ne connais pas le mdp" },
+                  { v: 'mot_de_passe',          l: "J'ai mis un mot de passe" },
+                  { v: 'mot_de_passe_supprime',  l: "J'ai supprime le mot de passe" },
+                  { v: 'demande_mot_de_passe',   l: "Je ne connais pas le mdp" },
                 ] as { v: TypeAlerte; l: string }[]).map(({ v, l }) => (
                   <button key={v} type="button" onClick={() => setType(v)}
                     className={`text-left px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
@@ -405,7 +438,7 @@ export default function ReportModal({ isOpen, onClose, defaultPcNumero, onSucces
                   : isSoftwareType
                   ? 'Details supplementaires'
                   : 'Description'}
-                {isSoftwareType
+                {(isSoftwareType || form.typeAlerte === 'mot_de_passe_supprime')
                   ? <span className="text-xs text-slate-400 font-normal ml-1">(optionnel)</span>
                   : <span className="text-red-500"> *</span>}
               </label>

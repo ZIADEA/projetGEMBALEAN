@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { AlertCircle, AlertTriangle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 import type { PC } from '@/types'
 
 type EtatConfig = {
@@ -48,13 +48,6 @@ export default function PCCard({ pc, alertCount, onReport }: PCCardProps) {
           </span>
         )}
 
-        {/* 24/7 badge for salle connexe */}
-        {isConnexe && (
-          <span className="absolute top-2 left-2 flex items-center gap-0.5 bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">
-            <AlertTriangle className="w-3 h-3" />
-            24/7
-          </span>
-        )}
 
         {/* PC image */}
         <Image

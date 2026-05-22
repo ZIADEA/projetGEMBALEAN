@@ -2,6 +2,7 @@ export type EtatPC = 'ok' | 'probleme' | 'hors_service'
 
 export type TypeAlerte =
   | 'mot_de_passe'
+  | 'mot_de_passe_supprime'
   | 'demande_mot_de_passe'
   | 'panne'
   | 'materiel_uc'

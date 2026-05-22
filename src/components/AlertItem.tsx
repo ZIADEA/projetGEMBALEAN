@@ -2,6 +2,7 @@
 
 import {
   Lock,
+  Unlock,
   KeyRound,
   Wrench,
   Server,
@@ -23,8 +24,9 @@ type TypeConfig = {
 }
 
 const TYPE_CONFIG: Record<TypeAlerte, TypeConfig> = {
-  mot_de_passe:        { label: 'Mot de passe signale',       Icon: Lock },
-  demande_mot_de_passe:{ label: 'Demande de mot de passe',    Icon: KeyRound },
+  mot_de_passe:          { label: 'Mot de passe signale',     Icon: Lock },
+  mot_de_passe_supprime: { label: 'Mot de passe supprime',   Icon: Unlock },
+  demande_mot_de_passe:  { label: 'Demande de mot de passe', Icon: KeyRound },
   panne:               { label: 'Panne / Ne demarre pas',     Icon: Wrench },
   materiel_uc:         { label: 'Unite centrale — probleme',  Icon: Server },
   materiel_moniteur:   { label: 'Moniteur — probleme',        Icon: Monitor },

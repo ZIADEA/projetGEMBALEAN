@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Cpu, HardDrive, Database, Layers,
   Pencil, Save, X, Plus, Trash2,
@@ -69,6 +69,10 @@ export default function SpecsCard({ pcNumero, initialSpecs, onSaved }: Props) {
   const [saving, setSaving]   = useState(false)
   const [collapsed, setCollapsed] = useState(false)
 
+  useEffect(() => {
+    if (!editing) setSpecs(initialSpecs ?? DEFAULT_SPECS)
+  }, [initialSpecs, editing])
+
   const startEdit = () => {
     setDraft(JSON.parse(JSON.stringify(specs)))
     setEditing(true)
@@ -80,7 +84,8 @@ export default function SpecsCard({ pcNumero, initialSpecs, onSaved }: Props) {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const { error } = await supabase.from('pcs').update({ specs: draft }).eq('numero', pcNumero)
+      const ramGb = parseInt(draft.ram.capacite, 10) || 16
+      const { error } = await supabase.from('pcs').update({ specs: draft, ram_gb: ramGb }).eq('numero', pcNumero)
       if (error) throw error
       setSpecs(draft)
       setEditing(false)

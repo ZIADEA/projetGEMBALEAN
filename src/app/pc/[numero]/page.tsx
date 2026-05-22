@@ -17,6 +17,7 @@ import AlertItem from '@/components/AlertItem'
 import ReportModal from '@/components/ReportModal'
 import UsageTracker from '@/components/UsageTracker'
 import SpecsCard from '@/components/SpecsCard'
+import NotesSection from '@/components/NotesSection'
 import type { PC, Alerte } from '@/types'
 
 /* ── composants du poste ── */
@@ -50,8 +51,9 @@ export default function PCDetailPage() {
   const [notFound, setNotFound] = useState(false)
   const [modalOpen, setModalOpen]   = useState(false)
   const [modalType, setModalType]   = useState<string | undefined>()
-  const [resolveModal, setResolveModal] = useState<string | null>(null) // alertId en cours
-  const [resolverNom, setResolverNom]   = useState('')
+  const [resolveModal, setResolveModal]   = useState<string | null>(null)
+  const [resolverNom, setResolverNom]     = useState('')
+  const [resolverAnnee, setResolverAnnee] = useState('')
   const [resolveLoading, setResolveLoading] = useState(false)
 
   const fetchData = useCallback(async () => {
@@ -78,15 +80,18 @@ export default function PCDetailPage() {
   const openResolve = (alertId: string) => {
     setResolveModal(alertId)
     setResolverNom('')
+    setResolverAnnee('')
   }
 
   const handleResolve = async () => {
     if (!resolveModal) return
     if (!resolverNom.trim()) { toast.error('Veuillez indiquer votre nom.'); return }
+    if (!resolverAnnee) { toast.error('Veuillez indiquer votre annee.'); return }
     setResolveLoading(true)
+    const resolu_par = `${resolverNom.trim()} · ${resolverAnnee}`
     const { error } = await supabase
       .from('alertes')
-      .update({ statut: 'resolu', resolu_par: resolverNom.trim() })
+      .update({ statut: 'resolu', resolu_par })
       .eq('id', resolveModal)
     if (error) {
       toast.error('Erreur lors de la mise a jour.')
@@ -95,6 +100,7 @@ export default function PCDetailPage() {
       toast.success('Alerte marquee comme resolue.')
       setResolveModal(null)
       setResolverNom('')
+      setResolverAnnee('')
       fetchData()
     }
     setResolveLoading(false)
@@ -104,8 +110,12 @@ export default function PCDetailPage() {
   const pending  = alerts.filter((a) => a.statut === 'en_attente')
   const resolved = alerts.filter((a) => a.statut === 'resolu')
 
-  // Last known password (most recent mot_de_passe alert)
-  const lastPassword = alerts.find((a) => a.type_alerte === 'mot_de_passe')
+  // Mot de passe : regarder la dernière alerte mot_de_passe ou mot_de_passe_supprime
+  const lastPwdAlert = alerts.find(
+    (a) => a.type_alerte === 'mot_de_passe' || a.type_alerte === 'mot_de_passe_supprime'
+  )
+  const lastPassword   = lastPwdAlert?.type_alerte === 'mot_de_passe' ? lastPwdAlert : null
+  const pwdSupprime    = lastPwdAlert?.type_alerte === 'mot_de_passe_supprime' ? lastPwdAlert : null
 
   // Composant status: is there a pending alert for each?
   const composantHasIssue = (key: string) =>
@@ -165,16 +175,7 @@ export default function PCDetailPage() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
 
         {/* ── Salle Connexe warning ── */}
-        {isConnexe && (
-          <div className="flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-xl px-4 py-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-bold text-amber-800">PC d&apos;entrainement — Ne pas eteindre</p>
-              <p className="text-xs text-amber-700 mt-1">{pc.description}</p>
-            </div>
-          </div>
-        )}
-
+       
         {/* ── PC Info ── */}
         <div className={`bg-white rounded-xl border-2 ${cfg.border} shadow-sm p-5`}>
           <div className="flex items-start gap-4 flex-wrap justify-between">
@@ -197,6 +198,8 @@ export default function PCDetailPage() {
                     <span className="font-mono text-sm font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg tracking-widest">
                       {lastPassword.description}
                     </span>
+                  ) : pwdSupprime ? (
+                    <span className="text-sm text-slate-400 italic">Mot de passe supprime</span>
                   ) : (
                     <span className="text-sm text-slate-400 italic">Aucun mot de passe</span>
                   )}
@@ -259,6 +262,9 @@ export default function PCDetailPage() {
           </div>
         </div>
 
+        {/* ── Messages etudiants ── */}
+        <NotesSection pcNumero={pc.numero} />
+
         {/* ── Specifications materielles ── */}
         <SpecsCard pcNumero={pc.numero} initialSpecs={pc.specs} onSaved={fetchData} />
 
@@ -309,6 +315,14 @@ export default function PCDetailPage() {
               <p className="text-xs text-amber-600 mt-1.5">
                 Signale par {lastPassword.nom_etudiant} · {lastPassword.annee} · {formatDate(lastPassword.created_at)}
               </p>
+            </div>
+          ) : pwdSupprime ? (
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+              <p className="text-xs text-slate-500 font-medium mb-1">Mot de passe supprime</p>
+              <p className="text-sm text-slate-600">
+                Le mot de passe a ete supprime par {pwdSupprime.nom_etudiant} · {pwdSupprime.annee}.
+              </p>
+              <p className="text-xs text-slate-400 mt-1">{formatDate(pwdSupprime.created_at)}</p>
             </div>
           ) : (
             <p className="text-sm text-slate-400">Aucun mot de passe signale pour ce PC.</p>
@@ -451,23 +465,32 @@ export default function PCDetailPage() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <p className="text-xs text-slate-500 mb-4">Indiquez votre nom pour confirmer la resolution de ce probleme.</p>
+            <p className="text-xs text-slate-500 mb-4">Indiquez votre nom et votre annee pour confirmer la resolution de ce probleme.</p>
             <input
               type="text"
               value={resolverNom}
               onChange={e => setResolverNom(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleResolve()}
               placeholder="Votre nom"
               autoFocus
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition mb-4"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition mb-3"
             />
+            <select
+              value={resolverAnnee}
+              onChange={e => setResolverAnnee(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition mb-4 bg-white text-slate-700"
+            >
+              <option value="">Votre annee</option>
+              <option value="3eme annee">3eme annee</option>
+              <option value="4eme annee">4eme annee</option>
+              <option value="5eme annee">5eme annee</option>
+            </select>
             <div className="flex gap-2">
               <button onClick={() => setResolveModal(null)} className="flex-1 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
                 Annuler
               </button>
               <button
                 onClick={handleResolve}
-                disabled={resolveLoading || !resolverNom.trim()}
+                disabled={resolveLoading || !resolverNom.trim() || !resolverAnnee}
                 className="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
