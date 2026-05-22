@@ -27,19 +27,19 @@ import os
 # ────────────────────────────────────────────────────────────
 # CONFIGURATION — changer uniquement BASE_URL apres deploiement
 # ────────────────────────────────────────────────────────────
-BASE_URL   = "https://projet-gembalean.vercel.app/"   # <- remplacer apres deploiement Vercel
+BASE_URL   = "https://pcmanager-leansolution.vercel.app/"   # <- remplacer apres deploiement Vercel
 OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))   # meme dossier que ce script
 NB_PCS     = 46
 
 # Couleurs
-QR_COLOR_SALLE     = "#1e293b"   # slate-900  — Salle Informatique
+QR_COLOR_SALLE     = "#1e293b"   # slate-900  — Salle IA
 QR_COLOR_CONNEXE   = "#b45309"   # amber-700  — Salle Connexe
 BACK_COLOR         = "#ffffff"
 
 # ────────────────────────────────────────────────────────────
 
 def get_salle(numero: int) -> str:
-    return "Salle Connexe" if numero >= 45 else "Salle Informatique"
+    return "Salle Connexe" if numero >= 45 else "Salle IA"
 
 def get_color(numero: int) -> str:
     return QR_COLOR_CONNEXE if numero >= 45 else QR_COLOR_SALLE

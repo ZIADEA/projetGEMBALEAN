@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'PC Manager - Salle Info',
-  description: 'Gestion des postes de la salle informatique',
+  description: 'Gestion des postes de la Salle IA',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -106,6 +106,9 @@ export default function DashboardPage() {
           <StatCard label="Alertes ouvertes" value={stats.alertes}    color="blue"   />
         </div>
 
+        {/* ── Conseils & Bonnes pratiques ── */}
+        <ConseilsSection />
+
         {/* ── Classification Hardware / Software ── */}
         {pending.length > 0 && (
           <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -246,13 +249,9 @@ export default function DashboardPage() {
             <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-semibold text-amber-800">
-                Attention — PC d&apos;entrainement longue duree
+                Attention — PC de la salle connexe l autre partie de la salle IA (derriere la baie vitree).
               </p>
-              <p className="text-xs text-amber-700 mt-1">
-                Ces PC peuvent tourner toute une semaine ou un mois sans interruption lors des sessions
-                d&apos;entrainement. Il est <strong>strictement interdit de les eteindre</strong>.
-                Contactez un responsable avant toute intervention.
-              </p>
+             
             </div>
           </div>
 
@@ -301,6 +300,86 @@ function StatCard({ label, value, color }: { label: string; value: number; color
       <p className={`text-xs font-medium ${c.label}`}>{label}</p>
       <p className={`text-2xl font-bold mt-1 ${c.value}`}>{value}</p>
     </div>
+  )
+}
+
+function ConseilsSection() {
+  return (
+    <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      {/* Conseil 1 — PC fixe */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="p-1.5 bg-slate-100 rounded-lg">
+            <BookMarked className="w-4 h-4 text-slate-600" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+            <h3 className="text-sm font-bold text-slate-800">Choisissez votre PC fixe</h3>
+          </div>
+        </div>
+        <p className="text-sm text-slate-600 leading-relaxed">
+          Conseil : Des la <strong className="text-slate-800">3eme annee</strong>, choisissez un PC et
+          conservez-le tout au long de votre formation — 3eme, 4eme et 5eme annee.
+          Evitez de changer de poste d&apos;une seance a l&apos;autre.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {['3eme annee', '4eme annee', '5eme annee'].map((a) => (
+            <span key={a} className="text-xs bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-full border border-slate-200">
+              {a}
+            </span>
+          ))}
+        </div>
+        <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
+          Un PC fixe vous permet de retrouver vos fichiers, vos logiciels configures et votre
+          environnement de travail a chaque seance.
+        </p>
+      </div>
+
+      {/* Conseil 2 — Organisation fichiers */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="p-1.5 bg-slate-100 rounded-lg">
+            <FolderOpen className="w-4 h-4 text-slate-600" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+            <h3 className="text-sm font-bold text-slate-800">Organisez vos fichiers sur le D:</h3>
+          </div>
+        </div>
+        <p className="text-sm text-slate-600 leading-relaxed mb-3">
+          Conseil : Si votre PC dispose du <strong className="text-slate-800">Disk 1 (D:) — 932 GB</strong>,
+          creez un dossier a votre nom et adoptez la structure suivante :
+        </p>
+
+        {/* Arbre de dossiers */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 font-mono text-xs text-slate-600 leading-relaxed">
+          <p className="font-bold text-slate-800">Prenom_Nom/</p>
+          <p className="ml-3 flex items-center gap-2">
+            <span>├──</span>
+            <span className="font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">Projets_VSCode/</span>
+          </p>
+          <p className="ml-6 text-slate-400">│   ├── Projet_Machine_Learning/</p>
+          <p className="ml-6 text-slate-400">│   ├── Projet_Web/</p>
+          <p className="ml-6 text-slate-400">│   └── ...</p>
+          <p className="ml-3">├── 3eme_annee/</p>
+          <p className="ml-6">│   ├── Nom_matiere/</p>
+          <p className="ml-9">│   │   ├── Cours/</p>
+          <p className="ml-9">│   │   ├── TD/</p>
+          <p className="ml-9">│   │   ├── TP/</p>
+          <p className="ml-9">│   │   └── Examens/</p>
+          <p className="ml-6">│   └── ...</p>
+          <p className="ml-3">├── 4eme_annee/</p>
+          <p className="ml-3">└── 5eme_annee/</p>
+        </div>
+
+        <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
+          Une bonne organisation est la cle de tout :) — retrouvez n&apos;importe quel fichier
+          en quelques secondes, meme des annees plus tard.
+        </p>
+      </div>
+
+    </section>
   )
 }
 
