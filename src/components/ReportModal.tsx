@@ -105,6 +105,9 @@ export default function ReportModal({ isOpen, onClose, defaultPcNumero, onSucces
         ? nomLogiciel.trim() + (description.trim() ? ` — ${description.trim()}` : '')
         : description.trim()
 
+    const INFO_TYPES: TypeAlerte[] = ['logiciel_installe', 'logiciel_desinstalle', 'reinitialisation', 'mot_de_passe']
+    const isInfo = INFO_TYPES.includes(typeAlerte as TypeAlerte)
+
     setLoading(true)
     try {
       const { error } = await supabase.from('alertes').insert({
@@ -113,7 +116,8 @@ export default function ReportModal({ isOpen, onClose, defaultPcNumero, onSucces
         description:  finalDescription,
         nom_etudiant: nom.trim(),
         annee,
-        statut: 'en_attente',
+        statut:    isInfo ? 'resolu' : 'en_attente',
+        resolu_par: isInfo ? nom.trim() : null,
       })
       if (error) throw error
 

@@ -48,8 +48,11 @@ export default function PCDetailPage() {
   const [alerts, setAlerts]     = useState<Alerte[]>([])
   const [loading, setLoading]   = useState(true)
   const [notFound, setNotFound] = useState(false)
-  const [modalOpen, setModalOpen]             = useState(false)
-  const [modalType, setModalType] = useState<string | undefined>()
+  const [modalOpen, setModalOpen]   = useState(false)
+  const [modalType, setModalType]   = useState<string | undefined>()
+  const [resolveModal, setResolveModal] = useState<string | null>(null) // alertId en cours
+  const [resolverNom, setResolverNom]   = useState('')
+  const [resolveLoading, setResolveLoading] = useState(false)
 
   const fetchData = useCallback(async () => {
     const [pcRes, alertsRes] = await Promise.all([
@@ -72,16 +75,29 @@ export default function PCDetailPage() {
     return () => { supabase.removeChannel(channel) }
   }, [fetchData, numero])
 
-  const handleResolve = async (alertId: string) => {
-    const { error } = await supabase.from('alertes').update({ statut: 'resolu' }).eq('id', alertId)
+  const openResolve = (alertId: string) => {
+    setResolveModal(alertId)
+    setResolverNom('')
+  }
+
+  const handleResolve = async () => {
+    if (!resolveModal) return
+    if (!resolverNom.trim()) { toast.error('Veuillez indiquer votre nom.'); return }
+    setResolveLoading(true)
+    const { error } = await supabase
+      .from('alertes')
+      .update({ statut: 'resolu', resolu_par: resolverNom.trim() })
+      .eq('id', resolveModal)
     if (error) {
       toast.error('Erreur lors de la mise a jour.')
     } else {
-      // Recalcule l'état du PC selon les alertes restantes
       await recalculateEtat(numero)
       toast.success('Alerte marquee comme resolue.')
+      setResolveModal(null)
+      setResolverNom('')
       fetchData()
     }
+    setResolveLoading(false)
   }
 
   /* ── derived state ── */
@@ -400,7 +416,7 @@ export default function PCDetailPage() {
                   </h3>
                 </div>
                 <div className="space-y-2">
-                  {pending.map((a) => <AlertItem key={a.id} alerte={a} onResolve={handleResolve} />)}
+                  {pending.map((a) => <AlertItem key={a.id} alerte={a} onResolve={openResolve} />)}
                 </div>
               </section>
             )}
@@ -420,6 +436,47 @@ export default function PCDetailPage() {
           </div>
         )}
       </main>
+
+      {/* ── Modal résolution ── */}
+      {resolveModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setResolveModal(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                <h3 className="font-bold text-slate-800 text-sm">Marquer comme resolu</h3>
+              </div>
+              <button onClick={() => setResolveModal(null)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">Indiquez votre nom pour confirmer la resolution de ce probleme.</p>
+            <input
+              type="text"
+              value={resolverNom}
+              onChange={e => setResolverNom(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleResolve()}
+              placeholder="Votre nom"
+              autoFocus
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition mb-4"
+            />
+            <div className="flex gap-2">
+              <button onClick={() => setResolveModal(null)} className="flex-1 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                Annuler
+              </button>
+              <button
+                onClick={handleResolve}
+                disabled={resolveLoading || !resolverNom.trim()}
+                className="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                {resolveLoading ? 'Envoi...' : 'Confirmer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ReportModal
         isOpen={modalOpen}

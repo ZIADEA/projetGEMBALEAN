@@ -113,6 +113,12 @@ export default function AlertItem({ alerte, compact = false, onResolve }: AlertI
           <span>{alerte.annee}</span>
           <span>·</span>
           <span>{formatDate(alerte.created_at)}</span>
+          {!pending && alerte.resolu_par && (
+            <>
+              <span>·</span>
+              <span className="text-green-600 font-medium">Resolu par {alerte.resolu_par}</span>
+            </>
+          )}
         </div>
         {onResolve && pending && (
           <button

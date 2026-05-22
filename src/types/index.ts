@@ -74,6 +74,7 @@ export interface Alerte {
   nom_etudiant: string
   annee: AnneeEtudiant
   statut: StatutAlerte
+  resolu_par: string | null
   created_at: string
 }
 
