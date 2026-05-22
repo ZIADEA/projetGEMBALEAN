@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { Monitor, Plus, RefreshCw, AlertTriangle, Wrench, Code2, Lock, Lightbulb, FolderOpen, BookMarked, Download, X, Eye, EyeOff, Bell, Mail } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
@@ -118,6 +119,10 @@ export default function DashboardPage() {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
+            <a href="https://www.ensam-umi.ac.ma/" target="_blank" rel="noopener noreferrer">
+              <Image src="/LOGO_ENSAM.png" alt="ENSAM" width={200} height={200} className="object-contain hover:opacity-80 transition-opacity" unoptimized />
+            </a>
+            <div className="w-px h-8 bg-slate-200" />
             <div className="p-2 bg-slate-900 rounded-lg">
               <Monitor className="w-5 h-5 text-white" />
             </div>

@@ -152,6 +152,10 @@ export default function PCDetailPage() {
             <Link href="/" className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
+            <a href="https://www.ensam-umi.ac.ma/" target="_blank" rel="noopener noreferrer">
+              <Image src="/LOGO_ENSAM.png" alt="ENSAM" width={160} height={160} className="object-contain hover:opacity-80 transition-opacity" unoptimized />
+            </a>
+            <div className="w-px h-6 bg-slate-200" />
             <div className="flex items-center gap-2">
               <Monitor className="w-4 h-4 text-slate-400" />
               <h1 className="font-bold text-slate-900">PC {numero}</h1>
