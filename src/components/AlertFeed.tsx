@@ -13,6 +13,11 @@ interface AlertFeedProps {
 export default function AlertFeed({ initialAlerts }: AlertFeedProps) {
   const [alerts, setAlerts] = useState<Alerte[]>(initialAlerts)
 
+  // Sync quand le parent rafraîchit ses données
+  useEffect(() => {
+    setAlerts(initialAlerts)
+  }, [initialAlerts])
+
   useEffect(() => {
     const channel = supabase
       .channel('alertes-realtime-feed')

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Monitor, Plus, RefreshCw, Radio, AlertTriangle, Wrench, Code2, Lock, Lightbulb, FolderOpen, BookMarked, Download, X, Eye, EyeOff } from 'lucide-react'
+import { Monitor, Plus, RefreshCw, AlertTriangle, Wrench, Code2, Lock, Lightbulb, FolderOpen, BookMarked, Download, X, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
 import PCCard from '@/components/PCCard'
@@ -244,12 +244,8 @@ export default function DashboardPage() {
 
         {/* ── Live Alert Feed ── */}
         <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3">
             <h2 className="font-semibold text-slate-800 text-sm">Alertes en temps reel</h2>
-            <div className="flex items-center gap-1.5">
-              <Radio className="w-3.5 h-3.5 text-green-500 animate-pulse" />
-              <span className="text-xs text-green-600 font-medium">En direct</span>
-            </div>
           </div>
           <AlertFeed initialAlerts={recentAlerts} />
         </section>
