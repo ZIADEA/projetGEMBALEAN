@@ -27,7 +27,7 @@ import os
 # ────────────────────────────────────────────────────────────
 # CONFIGURATION — changer uniquement BASE_URL apres deploiement
 # ────────────────────────────────────────────────────────────
-BASE_URL   = "https://ton-app.vercel.app"   # <- remplacer apres deploiement Vercel
+BASE_URL   = "https://projet-gembalean.vercel.app/"   # <- remplacer apres deploiement Vercel
 OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))   # meme dossier que ce script
 NB_PCS     = 46
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Monitor, Plus, RefreshCw, Radio, AlertTriangle, Wrench, Code2, Lock } from 'lucide-react'
+import { Monitor, Plus, RefreshCw, Radio, AlertTriangle, Wrench, Code2, Lock, Lightbulb, FolderOpen, BookMarked } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import PCCard from '@/components/PCCard'
 import AlertFeed from '@/components/AlertFeed'
