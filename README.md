@@ -1,6 +1,8 @@
 # PC Manager — Salle IA · ENSAM
 
 Application web de gestion et de suivi des postes informatiques de la Salle IA de  (ENSAM-UMI).
+<img width="853" height="480" alt="gembapc pptx  -  Dernier enregistrement par l’utilisateur" src="https://github.com/user-attachments/assets/9d16d4a8-bd22-4544-8f82-6c51fba8ba2d" />
+
 
 ---
 
