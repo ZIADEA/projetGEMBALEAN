@@ -296,6 +296,6 @@ src/
 
 ## Licence
 
-Projet développé pour l'usage interne de la **Salle IA — ENSAM Marrakech**.
+Projet développé pour l'usage interne de la **Salle IA — ENSAM Meknes**.
 
 [ensam-umi.ac.ma](https://www.ensam-umi.ac.ma/)
