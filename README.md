@@ -1,6 +1,6 @@
 # PC Manager — Salle IA · ENSAM
 
-Application web de gestion et de suivi des postes informatiques de la Salle IA de l'École Nationale des Sciences Appliquées de Marrakech (ENSAM-UMI).
+Application web de gestion et de suivi des postes informatiques de la Salle IA de  (ENSAM-UMI).
 
 ---
 
